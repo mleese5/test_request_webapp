@@ -1,0 +1,119 @@
+<!-- This CSS package applies Google styling; it should always be included. -->
+<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css">
+
+<style>
+
+* {
+box-sizing: border-box;
+}
+
+
+.ModalInfoStyle {
+    font-family: "calibri";
+    font-size: medium;
+    }
+
+.TableHeaderStyle {
+    font-family: "calibri";
+    font-weight: bold;
+    font-size: small;
+    word-wrap: break-word;
+    background-color: grey;
+    color: white;
+    padding: 10px 0px 10px 0px;
+    border: none !important;
+    }
+    
+    
+.TableCellStyle {
+font-family: "calibri";
+word-wrap: break-word;
+border: none !important;
+font-size: small;
+}
+
+
+
+.RuR_button{
+font-family: "calibri";
+font-size: medium;
+    position: relative;
+    left: 80%;
+    top: 20%;
+}
+
+
+.FilterStyle {
+font-family: "calibri";
+color: dimgrey;
+font-size: medium;
+font-weight: bold;
+display: block;
+vertical-align: top;
+float: none;
+padding: 10px 10px 10px 10px;
+}
+
+
+
+
+#dashboard-div {
+  width: 100%;
+  position: fixed;
+    top: 0;
+    left: 0;
+    right: 0; 
+}
+
+#control-div {
+  margin: 10px 0px 10px 0px;
+}
+
+#TRT-div {
+}
+
+#Platform-div {
+}
+
+#Programme-div {
+}
+
+#Customer-div {
+}
+
+#Gate-div {
+}
+
+
+  
+#Test_request_table_div{
+  height: 450px;
+  width:100%;
+}  
+  
+
+#Modal_text {
+margin: 20px 30px 20px 30px;
+}
+
+#Menu_button{
+height: 50px;
+margin: 10px 10px 10px 10px;
+display: flex;
+justify-content: left;
+align-items: center; 
+}
+
+
+
+#Modal_box_footer {
+margin: 10px 10px 10px 10px;
+}
+
+#Modal_header {
+padding: 20px 50px 20px 50px;
+}
+
+
+
+</style>

@@ -1,0 +1,228 @@
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript"  src="https://www.google.com/jsapi"></script>
+
+<script>
+  // Load the Visualization API and desired package(s).
+  google.load('visualization', '1.0', {'packages':['controls','table']});
+    
+ // declare some variable   
+ var data; 
+ var data2;    
+ var Test_request_Datatable;
+ var Test_request_DataView;
+ var RuR_notes_Datatable;
+ var Table_container;
+ var RuR_notes_DataView;
+ var Modal_box;
+ var Side_bar; 
+ var TRT;
+ var GateNum;
+ var ProgressBar;
+ var width;
+ var id;
+ var ProgressFraction;
+
+ 
+ // set various properties of table to CSS styles
+ var cssClassNames = {
+ 'headerRow': '',
+ 'tableRow': '',
+ 'oddTableRow': '',
+ 'selectedTableRow': '',
+ 'hoverTableRow': '',
+ 'headerCell': 'TableHeaderStyle',
+ 'tableCell': 'TableCellStyle',
+ 'rowNumberCell': ''};
+ 
+
+//  when page is loaded run the function to call the google script and get data from sheet
+google.setOnLoadCallback(sendQuery);
+
+  
+//-------------------------------------------------------------  
+//call the google script 'getSpreadsheetData' and get data from sheet.  If successful run 'SetupDataTables'
+  function sendQuery() {
+    google.script.run
+      .withSuccessHandler(SetupDataTables)
+      .getSpreadsheetData();
+     }
+
+
+// This function prepares the data and sets up 'DataTables', also a 'Dataview' 
+// for info see:    https://developers.google.com/chart/interactive/docs/datatables_dataviews 
+function SetupDataTables(response){
+   document.getElementById('Loading_message').style.display = "none";
+   // 1.convert the data from sheets to a datatable
+   Test_request_Rawdata = google.visualization.arrayToDataTable(response.data,false);
+   RuR_notes_Rawdata = google.visualization.arrayToDataTable(response.data2,false);
+   RuR_notes_Datatable = new google.visualization.Table(document.getElementById('Modal_text'));
+   // 2.create dataviews
+   Test_request_DataView = new google.visualization.DataView(Test_request_Rawdata);  
+   RuR_notes_DataView = new google.visualization.DataView(RuR_notes_Rawdata);     
+   // 3.set the columns you want to display in each data view
+   Test_request_DataView.setColumns([0,1,2,3,4,5,6,7,8,9,10,12,13,14,15]); 
+   RuR_notes_DataView.setColumns([0,1,2,3,4,5,6,7,8,9]); //here you set the columns you want to display 
+   // 4.call function to draw dashboard
+   Draw_Test_request_table();      
+   }
+
+
+// Function draws main test request table
+function Draw_Test_request_table () {
+
+   Table_container = new google.visualization.ChartWrapper({
+        'chartType': 'Table',
+        'containerId': 'Test_request_table_div',
+         'width': '100%', 
+         'height': '600px',
+         'options' : {'allowHtml': true, width: '100%', height: '600px','showRowNumber': false, 'cssClassNames': cssClassNames} //,                    
+   	});
+    
+    var TRTPicker = new google.visualization.ControlWrapper({
+        'controlType': 'StringFilter',
+        'containerId': 'TRT-div',
+        'options': { 'filterColumnLabel': 'TRT', 'matchType': 'exact', ui: {caption: "TRT", labelStacking: "vertical"}}
+      });
+      
+    var PlatformPicker = new google.visualization.ControlWrapper({
+        'controlType': 'CategoryFilter',
+        'containerId': 'Platform-div',
+        'options': { 'filterColumnLabel': 'Platform', ui: {caption: "Platform",label: " "}}
+      });
+        var ProgrammePicker = new google.visualization.ControlWrapper({
+        'controlType': 'CategoryFilter',
+        'containerId': 'Programme-div',
+        'options': { 'filterColumnLabel': 'Programme', ui: {caption: "Programme",label: " "}}
+      });      
+        var CustomerPicker = new google.visualization.ControlWrapper({
+        'controlType': 'StringFilter',
+        'containerId': 'Customer-div',
+        'options': { 'filterColumnLabel': 'Customer CDSID', 'matchType': 'any', ui: {caption: "Customer", labelStacking: "vertical"}}
+      });      
+        var TestTypePicker = new google.visualization.ControlWrapper({
+        'controlType': 'CategoryFilter',
+        'containerId': 'TestType-div',
+        'options': { 'filterColumnLabel': 'Test Type', ui: {caption: "Test Type",label: " "}}
+      });        
+        var GatePicker = new google.visualization.ControlWrapper({
+        'controlType': 'CategoryFilter',
+        'containerId': 'Gate-div',
+        'options': { 'filterColumnLabel': 'Team', ui: {caption: "Team",label: " "}}
+      });  
+      
+        var ReqDeptPicker = new google.visualization.ControlWrapper({
+        'controlType': 'CategoryFilter',
+        'containerId': 'ReqDept-div',
+        'options': { 'filterColumnLabel': 'Department (PTxxx)', ui: {caption: "Req.Department",label: " "}}
+      });  
+      
+   // setup a 'dashboard'
+   var dashboard_container = document.getElementById('dashboard_div');
+   var dashboard = new google.visualization.Dashboard(dashboard_container);  //added for dashboard ---------------------
+   // bind the controls to the table within the dashboard   
+   dashboard.bind([TRTPicker,GatePicker, PlatformPicker,ProgrammePicker, CustomerPicker, TestTypePicker, ReqDeptPicker], [Table_container]);
+   // draw the dashboard   
+  // dashboard.draw(Test_request_Rawdata);
+  dashboard.draw(Test_request_DataView);
+   //  add a listener event to trigger when a row is selected
+   google.visualization.events.addListener(Table_container, 'select', selectHandler);
+}
+
+
+function selectHandler(e) {
+//  runs when a row is selected, gets the row number and looks up TRT#, then cross references to the RUR table
+
+//  1. First find the slected row and then the corresponding row in the underlying data
+ var displayrow = Table_container.getChart().getSelection()[0].row;                            // gets row
+ var datatablerow = Table_container.getDataTable().getUnderlyingTableRowIndex(displayrow);     // finds relevent row in original datatable
+ 
+// 2. extract the info and create variables for the modal header
+ TRT = Test_request_Rawdata.getValue(datatablerow,0);                              // finds TRT number
+ GateNum = Test_request_Rawdata.getValue(datatablerow,1);                          //finds current gate
+ var TeamName = Test_request_Rawdata.getValue(datatablerow,2);                     //finds current gate
+ var TestDetails = Test_request_Rawdata.getValue(datatablerow,11);                 //finds deatiled info
+  var Custname = Test_request_Rawdata.getValue(datatablerow,12);                 //finds deatiled info
+    
+ // 3.  Show the pop up modal box
+ Modal_box=document.getElementById('Modal_box'); 
+ Modal_box.style.display='block'; 
+   
+ // 4. update the test description in modal
+ document.getElementById("Test_detail").innerHTML =TestDetails;
+ document.getElementById("Location").innerHTML = Location;
+ document.getElementById("Custname").innerHTML = Custname;
+ 
+  // 5. update progress bar based on Gateway
+ProgressBar=document.getElementById("myBar");          // get handle of progress bar in modal
+ProgressBar.innerHTML = ["G"+GateNum+" - "+TeamName];      //change progress bar text
+
+// set the width and color of the progress bar based on Gate number
+if (GateNum > 99){
+    ProgressBar.className="w3-red";
+    ProgressBar.style.width='100%';
+} else if(GateNum == 99){
+    ProgressBar.className="w3-purple";
+    ProgressBar.style.width='100%';
+} else if(GateNum == 9){
+    ProgressBar.className="w3-green";
+    ProgressBar.style.width='100%';
+} else if(GateNum == 0){
+    ProgressBar.className="w3-amber";
+    ProgressBar.style.width='5%';
+} else {
+    ProgressBar.className="w3-blue";
+    ProgressBar.style.width='0%';
+    width=0;
+    ProgressFraction =  ((GateNum / 9)*100);               // work out progess fraction 
+    id = setInterval(animate_bar, 10);                     // call the frame function to animate the progress bar with timer
+}
+
+// 6. create a filtered 'dataview' which we will display in the modal table 
+ var RuR_rows = RuR_notes_Rawdata.getFilteredRows([{column: 0, value: TRT}]);      // filter RuR datatable to rows with correct TRT number
+ var Location = RuR_notes_Rawdata.getValue(RuR_rows[RuR_rows.length -1],6);                 //finds location info
+ RuR_notes_DataView.setRows(RuR_rows);                                             //create a new 'dataview' with only the correct rows
+
+// 7. Draw the reduced table
+ RuR_notes_Datatable.draw(RuR_notes_DataView, {'allowHtml': true, 'showRowNumber': false, width: '100%', 'cssClassNames': cssClassNames});    //draw new RuR table
+
+
+  } // end of selectHandler code
+  
+    
+// Animate the progress bar when the modal opens  
+function animate_bar() {
+    if (width >= ProgressFraction) {
+      clearInterval(id);
+    } else {
+      width++; 
+      ProgressBar.style.width = width + '%'; 
+    }
+  }  
+  
+ 
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == Modal_box) {
+        Modal_box.style.display = "none";
+    }
+}
+
+// Sidebar open
+function w3_open() {
+    Side_bar=document.getElementById('mySidebar'); 
+    Side_bar.style.display = "block";
+    Side_bar.style.width = "250px";
+    
+}
+// Sidebar close
+function w3_close() {
+    Side_bar.style.display = "none";
+}
+
+// opens a window with the google form to add new meeting note, form is 'pre-filled' with TRT number
+function RuR_note_Add() {
+window.open('https://docs.google.com/a/jaguarlandrover.com/forms/d/e/1FAIpQLSdVx4u4xSbmqbuPQccakLHGlyLeijz2xfVeJC47tg18FzjBQw/viewform?entry.1745126475='+TRT);
+}
+
+
+</script>

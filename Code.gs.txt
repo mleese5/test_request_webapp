@@ -1,0 +1,40 @@
+//-------------------------------------------------------------
+//  Serves up the HTML to the webapp
+// ------------------------------------------------------------
+function doGet(e) {
+  var template = HtmlService.createTemplateFromFile('Index');
+
+  // Build and return HTML in IFRAME sandbox mode.
+  return template.evaluate()
+      .setTitle('Dashboard demo')
+      .setSandboxMode(HtmlService.SandboxMode.IFRAME);
+}
+
+//-------------------------------------------------------------
+//  Gets spreadsheet data and returns to webapp function
+// ------------------------------------------------------------
+function getSpreadsheetData() {
+  
+  //  gets data retruned from 'test request API' sheet
+  var sheetId = '1s1AF7Aqo-AF6AS1WaR-2ckxJoWDxlDug8U7avSRYi6w';
+  var ss = SpreadsheetApp.openById(sheetId).getSheetByName("Test_request_API");
+  var lastRow = ss.getLastRow();
+  var lastCol = ss.getLastColumn();
+  var data = ss.getRange(1, 1, lastRow,lastCol).getValues();
+
+
+  // gets data from 'RuR Notes API' sheet
+  var sheetId2 = '1s1AF7Aqo-AF6AS1WaR-2ckxJoWDxlDug8U7avSRYi6w';
+  var ss = SpreadsheetApp.openById(sheetId2).getSheetByName("RuR_notes_API");
+  var lastRow2 = ss.getLastRow();
+  var lastCol2 = ss.getLastColumn();
+  var data2 = ss.getRange(1, 3, lastRow2,lastCol2).getValues();
+  
+  // returns sheet data as object   
+  return{data:data, data2:data2};
+//return (data.length > 1,data2.length > 1) ? data : null;
+  
+}
+
+
+//------------------------------------------------------------------

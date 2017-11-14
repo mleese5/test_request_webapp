@@ -1,0 +1,80 @@
+<!-- Use a templated HTML printing scriptlet to import common stylesheet. -->
+<?!= HtmlService.createHtmlOutputFromFile('Stylesheet').getContent(); ?>
+<html>
+<head>
+<!-- Include icon styles -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!-- W3 styles -->
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+</head>
+  <body>
+  
+<!-- collapsable Sidebar for filter control -->
+<div class="w3-sidebar w3-bar-block w3-border-right" style="display:none" id="mySidebar">
+  <button onclick="w3_close()" class="w3-bar-item w3-large">Close &times;</button>
+  <div id="TRT-div" class='FilterStyle'> </div>
+  <div id="Customer-div" class='FilterStyle'></div>
+  <div id="Gate-div" class='FilterStyle'></div>
+  <div id="Platform-div" class='FilterStyle'></div>
+  <div id="Programme-div" class='FilterStyle'></div>
+  <div id="TestType-div" class='FilterStyle'></div>
+  <div id="ReqDept-div" class='FilterStyle'></div>
+  </div>
+  
+<!-- Sidebar button div-->
+<div id="Menu_button">
+<button style="font-family:'calibri'" onclick="w3_open()" >Search / Filter</button>
+<button style="font-family:'calibri'"onclick="window.open('https://docs.google.com/a/jaguarlandrover.com/forms/d/e/1FAIpQLSf5TTKiHjajddfED8Bs8SB3RtvRYoNIgvKvBCVfhdK72H58CA/viewform');"> New Request</button>
+</div>
+
+
+<!-- loading spinner-->
+<div id="Loading_message" class="fa fa-cog w3-spin" style="font-size:48px"></div>  
+
+<div id="dashboard_div">
+      <div id="Test_request_table_div">loading data please wait...</div>
+</div>      
+
+      <!-- The Modal -->
+ <div id="Modal_box" class="w3-modal">  
+    <div class="w3-modal-content"> 
+         <div>  
+             <!-- The Progress bar -->
+             <div id="Modal_header" class="ModalInfoStyle"> 
+                <div class="w3-light-grey"> 
+                  <div id="myBar" class="w3-container w3-center" style="width:100%"></div>
+                 </div>
+                 <div>
+                 <span style="font-weight:bold">Test Cell:  </span><span id="Location"></span>
+                 </div>
+                 <div>
+                  <span style="font-weight:bold">Customer:  </span><span id="Custname"></span>
+                 </div>
+                 <div>
+                  <span style="font-weight:bold">Description:  </span><span id="Test_detail"></span>
+                 </div>
+             </div>  
+         </div> 
+         <div class="w3-container">
+              <div onclick="document.getElementById('Modal_box').style.display='none'" 
+               class="w3-button w3-display-topright">&times; 
+              </div>   
+              <div id="Modal_text"> No meeting notes recorded
+              </div>  
+              <div id="Modal_box_footer"> 
+                   <button id="RuR_button" class="RuR_button" onClick="RuR_note_Add()"><span class="icon">+ Add new note</span></button>      
+              </div>  
+         </div> 
+    </div> 
+ </div> 
+
+  </body>
+</html>
+
+<!-- Store data passed to template here, so it is available to the
+     imported JavaScript. -->
+<script>
+</script>
+
+<!-- Use a templated HTML printing scriptlet to import JavaScript. -->
+<?!= HtmlService.createHtmlOutputFromFile('JavaScript').getContent(); ?>
